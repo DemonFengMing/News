@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新闻列表</title>
+</head>
+<body>
+<h1>新闻列表</h1>
+<table class="newslist" border="1">
+    <tr><th>新闻编号</th><th>新闻标题</th><th>新闻摘要</th><th>作者</th><th>创建时间</th><th>操作</th></tr>
+</table>
+<p class="re"></p>
+</body>
+<script src="js/jquery-1.12.4.min.js"></script>
+<script>
+
+/*    /!*
+    ajax 提交form
+    $("form").serialize()
+     * /*/
+
+
+    $(function () {
+
+        $.ajax({
+            url:"newslist.do",
+            success:function (result) {
+                //alert(result.status);
+                createDataList(result.data,".newslist");
+                $(".newslist tr:odd").css("background","aquamarine");
+
+            },
+            dataType:"json"
+        });
+
+    });
+
+
+
+    function createDataList(dataList,selector){
+
+        if(dataList.length === 0){
+            $(selector).append("<tr colspan='6'><td>暂时没有新闻数据</td></tr>");
+            return;
+        }
+        for(var i=0;i<dataList.length;i++){
+            var id = dataList[i]['id'];
+            var data = "<tr id='id"+id+"'>";
+            for(var fname in dataList[i] ){
+                    data += "<td>"+dataList[i][fname]+"</td>";
+            }
+            data += "<td><a href='commentadd.html?id="+id+"'>评论</a><a href='#' onclick='del("+id+")'>删除</a></td>"
+            data += "</tr>";
+
+            $(selector).append(data);
+        }
+    }
+
+function del(id){
+    var r = confirm("确定要删除改新闻以及评论");
+    if(r == true){
+        $.ajax({
+            url:"newsdel.do",
+            data:"id="+id,
+            success:function (result) {
+                if(result.status === 200){
+                    //alert("删除成功");
+                    //location.reload();
+                    $(".newslist #id"+id).remove();
+                    $(".re").html("删除成功");
+                    if(document.getElementsByTagName("tr").length <= 1){
+                        $(".newslist").append("<tr colspan='6'><td>暂时没有新闻数据</td></tr>");
+                    }
+
+                }else{
+                    //alert("删除失败");
+                    $(".re").html("删除失败");
+                }
+            },
+            dataType:"json"
+        });
+    }
+}
+
+</script>
+</html>

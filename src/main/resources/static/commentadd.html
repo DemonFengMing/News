@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加评论</title>
+</head>
+<body>
+    <h1>添加评论</h1>
+    <form>
+        评论内容(*):<textarea class="content" name="content"></textarea><br>
+        评论人:<input name="author" /><br>
+        <input class="addBnt" type="button" value="提交" /><a href="newslist.html"><input type="button" value="返回" /></a>
+    </form>
+</body>
+<script src="js/jquery-1.12.4.min.js"></script>
+<script>
+    $(function () {
+        $(".addBnt").click(function () {
+            var content = $(".content").val();
+            if(content == ""){
+                alert("评论内容不能为空");
+                return;
+            }
+
+            var id = location.href.substring(location.href.indexOf("id=")+3);
+            //alert(id);
+            var formdata = $("form").serialize();
+            $.ajax({
+                url:"commentsave.do",
+                data:formdata+"&newsId="+id,
+                success:function (result) {
+                    if(result.status === 200){
+                        location.href ="newslist.html";
+                    }else{
+                        alert("添加失败");
+                    }
+                },
+                dataType:"json"
+            });
+        });
+    });
+</script>
+</html>
